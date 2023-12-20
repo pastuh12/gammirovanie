@@ -1,5 +1,3 @@
-// todo refactor
-
 export class Gammirovanie {
   private readonly alf = [
     ' ',
@@ -67,7 +65,7 @@ export class Gammirovanie {
 
   encryptByMod2(text: string, key: string): string {
     const textArray = text.split('');
-    const keyArray = key.split('');
+    const keyArray = textArray.map((s, index) => String.fromCodePoint((s.charCodeAt(0) + index) % 33));
 
     let resultText = '';
 
@@ -79,8 +77,6 @@ export class Gammirovanie {
         keyCharBits = '0' + keyCharBits;
       }
 
-      console.log({ keyCharBits });
-
       keyBits += keyCharBits;
     });
     textArray.forEach((char) => {
@@ -88,14 +84,12 @@ export class Gammirovanie {
       while (charBits.length !== 6) {
         charBits = '0' + charBits;
       }
-      console.log({ charBits });
 
       let encodedCharBits = '';
       charBits.split('').forEach((bit, index) => {
         encodedCharBits += +bit ^ +keyBits[(index + bitsPast) % keyBits.length];
       });
       bitsPast += charBits.length;
-      console.log({ encodedCharBits });
 
       const encodedCharNumber = parseInt(encodedCharBits, 2) % this.alf.length;
       const encodedChar = this.alf[encodedCharNumber];
@@ -126,52 +120,4 @@ export class Gammirovanie {
 
     return resultText;
   }
-
-  // decryptByMod2(encryptText: string, key: string): string {
-  //   const keyLength = key.length;
-
-  //   const encryptTextArray = encryptText.split('');
-  //   const keyArray = key.split('');
-
-  //   let resultText = '';
-
-  //   encryptTextArray.forEach((char, index) => {
-  //     const charNumber = this.alf.indexOf(char);
-  //     const keyChar = keyArray[index % keyLength];
-  //     const keyCharNumber = this.alf.indexOf(keyChar);
-
-  //     const charNumberBits = (charNumber >>> 0).toString(2);
-  //     const keyCharNumberBits = (keyCharNumber >>> 0).toString(2);
-
-  //     const charNumberBitsArray = charNumberBits.split('');
-  //     const keyCharNumberBitsArray = keyCharNumberBits.split('');
-
-  //     let encodeCharNumberBits = '';
-
-  //     charNumberBitsArray.forEach((charBit, index) => {
-  //       const result = +charBit ^ +keyCharNumberBitsArray[index % keyCharNumberBitsArray.length];
-
-  //       encodeCharNumberBits += result.toString();
-  //     });
-
-  //     const encodeCharNumber = parseInt(encodeCharNumberBits, 2) % this.alf.length;
-
-  //     resultText += this.alf[encodeCharNumber];
-  //   });
-  // }
 }
-
-/**  шаги
-  1. Определяем алфавит
-  2. Получаем открытый текст и гамму
-  3. Получить размер ключа
-  4. Обрабатываем каждый символ открытого текста
-    4.1 Берем символ 
-    4.2 Определяем символ-пару из гаммы
-    4.3 Находим номера этих символов в алфавите
-    4.4 Переводим эти номера в двоичную запись
-    4.5 Операцией xor получаем номер зашифрованного символа
-    4.6 Остатком от деления находим символ, который пренадлежит получениму шифр-номеру
-    4.7 Добавляем зашифрованный символ в шифр-текст
-  5. Вывводим зашифрованный текст
-*/
